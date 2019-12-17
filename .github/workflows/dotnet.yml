@@ -1,0 +1,22 @@
+name: .NET Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup MSBuild
+      uses: warrenbuckley/Setup-MSBuild@v1
+    - name: Install dependencies
+      run: msbuild -t:restore
+    - name: Build project
+      run: msbuild BeatSaverSharp/BeatSaverSharp.csproj /t:Build /p:Configuration=Release
+    - name: Cleanup release
+      shell: bash
+      run: find "BeatSaverSharp/bin/Release" -type f ! -name "BeatSaverSharp.*" -delete
+    - name: Upload DLLs
+      uses: actions/upload-artifact@v1
+      with:
+        name: BeatSaverSharp-${{ github.sha }}
+        path: ./BeatSaverSharp/bin/Release
