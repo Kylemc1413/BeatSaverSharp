@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -38,7 +38,7 @@ namespace BeatSaverSharp
         /// Beats per Minute
         /// </summary>
         [JsonProperty("bpm")]
-        public int BPM { get; set; }
+        public float BPM { get; set; }
 
         /// <summary>
         /// </summary>
