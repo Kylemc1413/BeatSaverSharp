@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
@@ -50,13 +50,13 @@ namespace BeatSaverSharp
         /// Fetch the previous page in this sequence
         /// </summary>
         /// <returns></returns>
-        public async Task<Page> FetchPreviousPage()
+        public async Task<Page> FetchPreviousPage(IProgress<double> progress = null)
         {
             if (PreviousPage == null) return null;
 
             string url = $"{PageURI}/{PreviousPage}";
             if (Query != null) url += $"?q={HttpUtility.UrlEncode(Query)}";
-            Page p = await BeatSaver.FetchPaged(url);
+            Page p = await BeatSaver.FetchPaged(url, progress);
 
             p.PageURI = PageURI;
             p.Query = Query;
@@ -68,13 +68,13 @@ namespace BeatSaverSharp
         /// Fetch the next page in this sequence
         /// </summary>
         /// <returns></returns>
-        public async Task<Page> FetchNextPage()
+        public async Task<Page> FetchNextPage(IProgress<double> progress = null)
         {
             if (NextPage == null) return null;
 
             string url = $"{PageURI}/{NextPage}";
             if (Query != null) url += $"?q={HttpUtility.UrlEncode(Query)}";
-            Page p = await BeatSaver.FetchPaged(url);
+            Page p = await BeatSaver.FetchPaged(url, progress);
 
             p.PageURI = PageURI;
 
