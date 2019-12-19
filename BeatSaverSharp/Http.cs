@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using BeatSaverSharp.Exceptions;
@@ -33,15 +34,17 @@ namespace BeatSaverSharp
             Client.DefaultRequestHeaders.Add("User-Agent", $"BeatSaver.Net/{version}");
         }
 
-        internal static async Task<HttpResponse> GetAsync(string url, IProgress<double> progress = null)
+        internal static async Task<HttpResponse> GetAsync(string url, CancellationToken token, IProgress<double> progress = null)
         {
             InitHeaders();
 
-            HttpResponseMessage resp = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            HttpResponseMessage resp = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
             if ((int)resp.StatusCode == 429)
             {
                 throw new RateLimitExceededException(resp);
             }
+
+            if (token.IsCancellationRequested) throw new TaskCanceledException();
 
             using (MemoryStream ms = new MemoryStream())
             using (Stream s = await resp.Content.ReadAsStreamAsync())
@@ -55,6 +58,8 @@ namespace BeatSaverSharp
 
                 while ((bytesRead = await s.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
+                    if (token.IsCancellationRequested) throw new TaskCanceledException();
+
                     if (contentLength != null)
                     {
                         double prog = (double)totalRead / (double)contentLength;
