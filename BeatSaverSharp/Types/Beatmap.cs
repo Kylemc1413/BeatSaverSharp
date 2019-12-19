@@ -243,7 +243,7 @@ namespace BeatSaverSharp
         public async Task<byte[]> DownloadZip(bool direct = false)
         {
             string url = direct ? DirectDownload : DownloadURL;
-            var resp = await BeatSaver.Client.GetAsync($"{BeatSaver.BaseURL}{url}");
+            var resp = await BeatSaver.Client.GetAsync($"{BeatSaver.BaseURL}{url}").ConfigureAwait(false);
 
             return await resp.Content.ReadAsByteArrayAsync();
         }
@@ -254,7 +254,7 @@ namespace BeatSaverSharp
         /// <returns></returns>
         public async Task<byte[]> FetchCoverImage()
         {
-            var resp = await BeatSaver.Client.GetAsync($"{BeatSaver.BaseURL}{CoverURL}");
+            var resp = await BeatSaver.Client.GetAsync($"{BeatSaver.BaseURL}{CoverURL}").ConfigureAwait(false);
             return await resp.Content.ReadAsByteArrayAsync();
         }
         #endregion

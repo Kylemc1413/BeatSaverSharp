@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -40,7 +40,7 @@ namespace BeatSaverSharp
         {
             InitHeaders();
 
-            var resp = await Client.GetAsync(url);
+            var resp = await Client.GetAsync(url).ConfigureAwait(false);
             if (resp.StatusCode == HttpStatusCode.NotFound) return null;
 
             using (Stream s = await resp.Content.ReadAsStreamAsync())
@@ -55,7 +55,7 @@ namespace BeatSaverSharp
         {
             InitHeaders();
 
-            var resp = await Client.GetAsync(url);
+            var resp = await Client.GetAsync(url).ConfigureAwait(false);
             if (resp.StatusCode == HttpStatusCode.NotFound) return null;
 
             using (Stream s = await resp.Content.ReadAsStreamAsync())
@@ -159,7 +159,7 @@ namespace BeatSaverSharp
         {
             InitHeaders();
 
-            var resp = await Client.GetAsync($"users/find/{id}");
+            var resp = await Client.GetAsync($"users/find/{id}").ConfigureAwait(false);
             if (resp.StatusCode == HttpStatusCode.NotFound) return null;
 
             using (Stream s = await resp.Content.ReadAsStreamAsync())
