@@ -16,6 +16,7 @@ namespace BeatSaverSharp
         internal static HttpClient Client = new HttpClient()
         {
             BaseAddress = new Uri($"{BeatSaver.BaseURL}/api/"),
+            Timeout = TimeSpan.FromSeconds(30),
         };
 
         internal static JsonSerializer Serializer = new JsonSerializer();
