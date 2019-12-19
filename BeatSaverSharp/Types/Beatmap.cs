@@ -175,14 +175,14 @@ namespace BeatSaverSharp
             string json = JsonConvert.SerializeObject(payload);
             HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var resp = await BeatSaver.Client.PostAsync($"vote/steam/{Key}", content);
+            var resp = await Http.Client.PostAsync($"vote/steam/{Key}", content);
             if (resp.IsSuccessStatusCode)
             {
                 using (Stream s = await resp.Content.ReadAsStreamAsync())
                 using (StreamReader sr = new StreamReader(s))
                 using (JsonReader reader = new JsonTextReader(sr))
                 {
-                    Beatmap updated = BeatSaver.Serializer.Deserialize<Beatmap>(reader);
+                    Beatmap updated = Http.Serializer.Deserialize<Beatmap>(reader);
                     Stats = updated.Stats;
 
                     return true;
@@ -194,7 +194,7 @@ namespace BeatSaverSharp
             using (StreamReader sr = new StreamReader(s))
             using (JsonReader reader = new JsonTextReader(sr))
             {
-                error = BeatSaver.Serializer.Deserialize<RestError>(reader);
+                error = Http.Serializer.Deserialize<RestError>(reader);
             }
 
             if (error.Identifier == "ERR_INVALID_STEAM_ID") throw new InvalidSteamIDException(payload.SteamID);
@@ -239,23 +239,27 @@ namespace BeatSaverSharp
         /// Download the Beatmap Zip as a byte array
         /// </summary>
         /// <param name="direct">If true, will skip counting the download request</param>
+        /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<byte[]> DownloadZip(bool direct = false)
+        public async Task<byte[]> DownloadZip(bool direct = false, IProgress<double> progress = null)
         {
             string url = direct ? DirectDownload : DownloadURL;
-            var resp = await BeatSaver.Client.GetAsync($"{BeatSaver.BaseURL}{url}").ConfigureAwait(false);
+            var resp = await Http.GetAsync(url, progress).ConfigureAwait(false);
 
-            return await resp.Content.ReadAsByteArrayAsync();
+            return resp.Bytes();
         }
 
         /// <summary>
         /// Fetch the Beatmap's Cover Image as a byte array
         /// </summary>
+        /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<byte[]> FetchCoverImage()
+        public async Task<byte[]> FetchCoverImage(IProgress<double> progress = null)
         {
-            var resp = await BeatSaver.Client.GetAsync($"{BeatSaver.BaseURL}{CoverURL}").ConfigureAwait(false);
-            return await resp.Content.ReadAsByteArrayAsync();
+            string url = $"{BeatSaver.BaseURL}{CoverURL}";
+            var resp = await Http.GetAsync(url, progress).ConfigureAwait(false);
+
+            return resp.Bytes();
         }
         #endregion
     }
