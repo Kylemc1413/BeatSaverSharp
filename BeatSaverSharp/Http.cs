@@ -55,8 +55,6 @@ namespace BeatSaverSharp
 
                     await ms.WriteAsync(buffer, 0, bytesRead);
                     totalRead += bytesRead;
-
-                    System.Threading.Thread.Sleep(2);
                 }
 
                 progress?.Report(1);
