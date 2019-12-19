@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace BeatSaver.Exceptions
+namespace BeatSaverSharp.Exceptions
 {
     /// <summary>
     /// Thrown when an invalid or mismatched SteamID is used to vote with
