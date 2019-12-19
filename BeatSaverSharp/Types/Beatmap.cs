@@ -26,7 +26,7 @@ namespace BeatSaverSharp
         /// Fetch a Beatmap by Key
         /// </summary>
         /// <param name="key">Hex Key</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Beatmap> FromKey(string key, CancellationToken token, IProgress<double> progress = null) => await BeatSaver.Key(key, token, progress);
@@ -42,7 +42,7 @@ namespace BeatSaverSharp
         /// Fetch a Beatmap by Hash
         /// </summary>
         /// <param name="hash">SHA1 Hash</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Beatmap> FromHash(string hash, CancellationToken token, IProgress<double> progress = null) => await BeatSaver.Hash(hash, token, progress);
@@ -266,7 +266,7 @@ namespace BeatSaverSharp
         /// Download the Beatmap Zip as a byte array
         /// </summary>
         /// <param name="direct">If true, will skip counting the download request</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public async Task<byte[]> DownloadZip(bool direct, CancellationToken token, IProgress<double> progress = null)
@@ -286,7 +286,7 @@ namespace BeatSaverSharp
         /// <summary>
         /// Fetch the Beatmap's Cover Image as a byte array
         /// </summary>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public async Task<byte[]> FetchCoverImage(CancellationToken token, IProgress<double> progress = null)

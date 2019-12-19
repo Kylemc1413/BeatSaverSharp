@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,15 +43,15 @@ namespace BeatSaverSharp
         /// <summary>
         /// Fetch a page of Latest beatmaps
         /// </summary>
-        /// <param name="page">Optional page number</param>
+        /// <param name="page">Optional page index (defaults to 0)</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Latest(uint page = 0, IProgress<double> progress = null) => await FetchMapsPage(PageType.Latest, page, CancellationToken.None, progress);
         /// <summary>
         /// Fetch a page of Latest beatmaps
         /// </summary>
-        /// <param name="page">Optional page number</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="page">Page index</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Latest(uint page, CancellationToken token, IProgress<double> progress = null) => await FetchMapsPage(PageType.Latest, page, token, progress);
@@ -59,15 +59,15 @@ namespace BeatSaverSharp
         /// <summary>
         /// Fetch a page of Hot beatmaps
         /// </summary>
-        /// <param name="page">Optional page number</param>
+        /// <param name="page">Optional page index (defaults to 0)</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Hot(uint page = 0, IProgress<double> progress = null) => await FetchMapsPage(PageType.Hot, page, CancellationToken.None, progress);
         /// <summary>
         /// Fetch a page of Hot beatmaps
         /// </summary>
-        /// <param name="page">Optional page number</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="page">Page index</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Hot(uint page, CancellationToken token, IProgress<double> progress = null) => await FetchMapsPage(PageType.Hot, page, token, progress);
@@ -75,15 +75,15 @@ namespace BeatSaverSharp
         /// <summary>
         /// Fetch a page of beatmaps ordered by their Rating
         /// </summary>
-        /// <param name="page">Optional page number</param>
+        /// <param name="page">Optional page index (defaults to 0)</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Rating(uint page = 0, IProgress<double> progress = null) => await FetchMapsPage(PageType.Rating, page, CancellationToken.None, progress);
         /// <summary>
         /// Fetch a page of beatmaps ordered by their Rating
         /// </summary>
-        /// <param name="page">Optional page number</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="page">Page index</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Rating(uint page, CancellationToken token, IProgress<double> progress = null) => await FetchMapsPage(PageType.Rating, page, token, progress);
@@ -91,15 +91,15 @@ namespace BeatSaverSharp
         /// <summary>
         /// Fetch a page of beatmaps ordered by their download count
         /// </summary>
-        /// <param name="page">Optional page number</param>
+        /// <param name="page">Optional page index (defaults to 0)</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Downloads(uint page = 0, IProgress<double> progress = null) => await FetchMapsPage(PageType.Downloads, page, CancellationToken.None, progress);
         /// <summary>
         /// Fetch a page of beatmaps ordered by their download count
         /// </summary>
-        /// <param name="page">Optional page number</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="page">Page index</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Downloads(uint page, CancellationToken token, IProgress<double> progress = null) => await FetchMapsPage(PageType.Downloads, page, token, progress);
@@ -107,15 +107,15 @@ namespace BeatSaverSharp
         /// <summary>
         /// Fetch a page of beatmaps ordered by their play count
         /// </summary>
-        /// <param name="page">Optional page number</param>
+        /// <param name="page">Optional page index (defaults to 0)</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Plays(uint page = 0, IProgress<double> progress = null) => await FetchMapsPage(PageType.Plays, page, CancellationToken.None, progress);
         /// <summary>
         /// Fetch a page of beatmaps ordered by their play count
         /// </summary>
-        /// <param name="page">Optional page number</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="page">Page index</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Plays(uint page, CancellationToken token, IProgress<double> progress = null) => await FetchMapsPage(PageType.Plays, page, token, progress);
@@ -131,7 +131,7 @@ namespace BeatSaverSharp
         /// Fetch a Beatmap by Key
         /// </summary>
         /// <param name="key">Hex Key</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Beatmap> Key(string key, CancellationToken token, IProgress<double> progress = null) => await FetchSingle($"maps/{SingleType.Key}/{key}", token, progress);
@@ -147,7 +147,7 @@ namespace BeatSaverSharp
         /// Fetch a Beatmap by Hash
         /// </summary>
         /// <param name="hash">SHA1 Hash</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Beatmap> Hash(string hash, CancellationToken token, IProgress<double> progress = null) => await FetchSingle($"maps/{SingleType.Hash}/{hash}", token, progress);
@@ -172,7 +172,7 @@ namespace BeatSaverSharp
         /// Text Search
         /// </summary>
         /// <param name="query">Text Query</param>
-        /// <param name="page">Optional Page Index</param>
+        /// <param name="page">Optional page index (defaults to 0)</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Search(string query, uint page = 0, IProgress<double> progress = null) => await FetchSearchPage(SearchType.Text, query, page, CancellationToken.None, progress);
@@ -180,8 +180,8 @@ namespace BeatSaverSharp
         /// Text Search
         /// </summary>
         /// <param name="query">Text Query</param>
-        /// <param name="page">Optional Page Index</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="page">Page index</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> Search(string query, uint page, CancellationToken token, IProgress<double> progress = null) => await FetchSearchPage(SearchType.Text, query, page, token, progress);
@@ -190,7 +190,7 @@ namespace BeatSaverSharp
         /// Advanced Lucene Search
         /// </summary>
         /// <param name="query">Lucene Query</param>
-        /// <param name="page">Optional Page Index</param>
+        /// <param name="page">Optional page index (defaults to 0)</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> SearchAdvanced(string query, uint page = 0, IProgress<double> progress = null) => await FetchSearchPage(SearchType.Advanced, query, page, CancellationToken.None, progress);
@@ -198,8 +198,8 @@ namespace BeatSaverSharp
         /// Advanced Lucene Search
         /// </summary>
         /// <param name="query">Lucene Query</param>
-        /// <param name="page">Optional Page Index</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="page">Page index</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<Page> SearchAdvanced(string query, uint page, CancellationToken token, IProgress<double> progress = null) => await FetchSearchPage(SearchType.Advanced, query, page, token, progress);
@@ -215,7 +215,7 @@ namespace BeatSaverSharp
         /// Fetch a User by ID
         /// </summary>
         /// <param name="id">User ID</param>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public static async Task<User> User(string id, CancellationToken token, IProgress<double> progress = null)

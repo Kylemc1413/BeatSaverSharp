@@ -56,7 +56,7 @@ namespace BeatSaverSharp
         /// <summary>
         /// Fetch the previous page in this sequence
         /// </summary>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public async Task<Page> FetchPreviousPage(CancellationToken token, IProgress<double> progress = null)
@@ -82,7 +82,7 @@ namespace BeatSaverSharp
         /// <summary>
         /// Fetch the next page in this sequence
         /// </summary>
-        /// <param name="token">Optional cancellation token</param>
+        /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
         public async Task<Page> FetchNextPage(CancellationToken token, IProgress<double> progress = null)
