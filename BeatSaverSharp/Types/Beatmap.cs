@@ -21,7 +21,7 @@ namespace BeatSaverSharp
         /// <param name="key">Hex Key</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public static async Task<Beatmap> FromKey(string key, IProgress<double> progress = null) => await BeatSaver.Key(key, progress);
+        public static async Task<Beatmap> FromKey(string key, string userAgent, IProgress<double> progress = null) => await BeatSaver.Key(key, userAgent, progress);
         /// <summary>
         /// Fetch a Beatmap by Key
         /// </summary>
@@ -29,7 +29,7 @@ namespace BeatSaverSharp
         /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public static async Task<Beatmap> FromKey(string key, CancellationToken token, IProgress<double> progress = null) => await BeatSaver.Key(key, token, progress);
+        public static async Task<Beatmap> FromKey(string key, string userAgent, CancellationToken token, IProgress<double> progress = null) => await BeatSaver.Key(key, userAgent, token, progress);
 
         /// <summary>
         /// Fetch a Beatmap by Hash
@@ -37,7 +37,7 @@ namespace BeatSaverSharp
         /// <param name="hash">SHA1 Hash</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public static async Task<Beatmap> FromHash(string hash, IProgress<double> progress = null) => await BeatSaver.Hash(hash, progress);
+        public static async Task<Beatmap> FromHash(string hash, string userAgent, IProgress<double> progress = null) => await BeatSaver.Hash(hash, userAgent, progress);
         /// <summary>
         /// Fetch a Beatmap by Hash
         /// </summary>
@@ -45,7 +45,7 @@ namespace BeatSaverSharp
         /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public static async Task<Beatmap> FromHash(string hash, CancellationToken token, IProgress<double> progress = null) => await BeatSaver.Hash(hash, token, progress);
+        public static async Task<Beatmap> FromHash(string hash, string userAgent, CancellationToken token, IProgress<double> progress = null) => await BeatSaver.Hash(hash, userAgent, token, progress);
         #endregion
 
         #region JSON Properties
@@ -127,9 +127,9 @@ namespace BeatSaverSharp
         /// Fetch latest values
         /// </summary>
         /// <returns></returns>
-        public async Task Refresh()
+        public async Task Refresh(string userAgent)
         {
-            Beatmap b = await FromHash(Hash);
+            Beatmap b = await FromHash(Hash, userAgent);
 
             Name = b.Name;
             Description = b.Description;
@@ -140,9 +140,9 @@ namespace BeatSaverSharp
         /// Fetch latest stats
         /// </summary>
         /// <returns></returns>
-        public async Task RefreshStats()
+        public async Task RefreshStats(string userAgent)
         {
-            Beatmap b = await FromHash(Hash);
+            Beatmap b = await FromHash(Hash, userAgent);
             Stats = b.Stats;
         }
 
@@ -261,7 +261,7 @@ namespace BeatSaverSharp
         /// <param name="direct">If true, will skip counting the download request</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<byte[]> DownloadZip(bool direct = false, IProgress<double> progress = null) => await DownloadZip(direct, CancellationToken.None, progress);
+        public async Task<byte[]> DownloadZip(string userAgent, bool direct = false, IProgress<double> progress = null) => await DownloadZip(userAgent, direct, CancellationToken.None, progress);
         /// <summary>
         /// Download the Beatmap Zip as a byte array
         /// </summary>
@@ -269,10 +269,10 @@ namespace BeatSaverSharp
         /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<byte[]> DownloadZip(bool direct, CancellationToken token, IProgress<double> progress = null)
+        public async Task<byte[]> DownloadZip(string userAgent, bool direct, CancellationToken token, IProgress<double> progress = null)
         {
             string url = direct ? DirectDownload : DownloadURL;
-            var resp = await Http.GetAsync(url, token, progress).ConfigureAwait(false);
+            var resp = await Http.GetAsync(url, userAgent, token, progress).ConfigureAwait(false);
 
             return resp.Bytes();
         }
@@ -282,17 +282,17 @@ namespace BeatSaverSharp
         /// </summary>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<byte[]> FetchCoverImage(IProgress<double> progress = null) => await FetchCoverImage(CancellationToken.None, progress);
+        public async Task<byte[]> FetchCoverImage(string userAgent, IProgress<double> progress = null) => await FetchCoverImage(userAgent, CancellationToken.None, progress);
         /// <summary>
         /// Fetch the Beatmap's Cover Image as a byte array
         /// </summary>
         /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<byte[]> FetchCoverImage(CancellationToken token, IProgress<double> progress = null)
+        public async Task<byte[]> FetchCoverImage(string userAgent, CancellationToken token, IProgress<double> progress = null)
         {
             string url = $"{BeatSaver.BaseURL}{CoverURL}";
-            var resp = await Http.GetAsync(url, token, progress).ConfigureAwait(false);
+            var resp = await Http.GetAsync(url, userAgent, token, progress).ConfigureAwait(false);
 
             return resp.Bytes();
         }

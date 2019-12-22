@@ -22,9 +22,9 @@ namespace BeatSaverSharp
             BaseAddress = new Uri($"{BeatSaver.BaseURL}/api/"),
             Timeout = TimeSpan.FromSeconds(30),
         };
-
+        internal static Uri BaseUri = new Uri($"{BeatSaver.BaseURL}/api/");
         internal static JsonSerializer Serializer = new JsonSerializer();
-
+        internal static string UserAgent = $"BeatSaver.Net/{Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
         private static void InitHeaders()
         {
             if (headersInit == true) return;
@@ -34,11 +34,18 @@ namespace BeatSaverSharp
             Client.DefaultRequestHeaders.Add("User-Agent", $"BeatSaver.Net/{version}");
         }
 
-        internal static async Task<HttpResponse> GetAsync(string url, CancellationToken token, IProgress<double> progress = null)
+        internal static async Task<HttpResponse> GetAsync(string url, string userAgent,  CancellationToken token, IProgress<double> progress = null)
         {
-            InitHeaders();
+         //   InitHeaders();
+            HttpRequestMessage req = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(BaseUri, url),
+                Method = HttpMethod.Get
+            };
 
-            HttpResponseMessage resp = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
+            req.Headers.Add("User-Agent", $"{UserAgent} ({userAgent})");
+
+            HttpResponseMessage resp = await Client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
             if ((int)resp.StatusCode == 429)
             {
                 throw new RateLimitExceededException(resp);

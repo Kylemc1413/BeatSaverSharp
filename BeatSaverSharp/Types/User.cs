@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -26,7 +26,7 @@ namespace BeatSaverSharp
         /// </summary>
         /// <param name="page">Optional page index (defaults to 0)</param>
         /// <param name="progress">Optional progress reporter</param>
-        public async Task<Page> Beatmaps(uint page = 0, IProgress<double> progress = null) => await Beatmaps(page, CancellationToken.None, progress);
+        public async Task<Page> Beatmaps(string userAgent, uint page = 0, IProgress<double> progress = null) => await Beatmaps(userAgent, page, CancellationToken.None, progress);
         /// <summary>
         /// Fetch all Beatmaps uploaded by this user
         /// </summary>
@@ -34,12 +34,12 @@ namespace BeatSaverSharp
         /// <param name="token">Cancellation token</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<Page> Beatmaps(uint page, CancellationToken token, IProgress<double> progress = null)
+        public async Task<Page> Beatmaps(string userAgent, uint page, CancellationToken token, IProgress<double> progress = null)
         {
             string pageURI = $"maps/{PageType.Uploader}/{ID}";
             string url = $"{pageURI}/{page}";
 
-            Page p = await BeatSaver.FetchPaged(url, token, progress);
+            Page p = await BeatSaver.FetchPaged(url, userAgent, token, progress);
             p.PageURI = pageURI;
 
             return p;
