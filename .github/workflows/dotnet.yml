@@ -12,9 +12,11 @@ jobs:
       run: msbuild -t:restore
     - name: Build project
       run: msbuild BeatSaverSharp/BeatSaverSharp.csproj /t:Build /p:Configuration=Release
-    - name: Cleanup release
+    - name: Prepare artifact
       shell: bash
-      run: find "BeatSaverSharp/bin/Release" -type f ! -name "BeatSaverSharp.*" -delete
+      run: |
+        find "BeatSaverSharp/bin/Release" -type f ! -name "BeatSaverSharp.*" -delete
+        cp "LICENSE" "BeatSaverSharp/bin/Release/LICENSE.BeatSaverSharp.txt"
     - name: Upload DLLs
       uses: actions/upload-artifact@v1
       with:

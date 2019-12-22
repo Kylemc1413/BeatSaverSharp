@@ -1,12 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using BeatSaverSharp.Exceptions;
 
 namespace BeatSaverSharp
 {
@@ -16,6 +20,7 @@ namespace BeatSaverSharp
         internal static HttpClient Client = new HttpClient()
         {
             BaseAddress = new Uri($"{BeatSaver.BaseURL}/api/"),
+            Timeout = TimeSpan.FromSeconds(30),
         };
 
         internal static JsonSerializer Serializer = new JsonSerializer();
@@ -29,11 +34,17 @@ namespace BeatSaverSharp
             Client.DefaultRequestHeaders.Add("User-Agent", $"BeatSaver.Net/{version}");
         }
 
-        internal static async Task<HttpResponse> GetAsync(string url, IProgress<double> progress = null)
+        internal static async Task<HttpResponse> GetAsync(string url, CancellationToken token, IProgress<double> progress = null)
         {
             InitHeaders();
 
-            HttpResponseMessage resp = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            HttpResponseMessage resp = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
+            if ((int)resp.StatusCode == 429)
+            {
+                throw new RateLimitExceededException(resp);
+            }
+
+            if (token.IsCancellationRequested) throw new TaskCanceledException();
 
             using (MemoryStream ms = new MemoryStream())
             using (Stream s = await resp.Content.ReadAsStreamAsync())
@@ -47,6 +58,8 @@ namespace BeatSaverSharp
 
                 while ((bytesRead = await s.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
+                    if (token.IsCancellationRequested) throw new TaskCanceledException();
+
                     if (contentLength != null)
                     {
                         double prog = (double)totalRead / (double)contentLength;
@@ -55,8 +68,6 @@ namespace BeatSaverSharp
 
                     await ms.WriteAsync(buffer, 0, bytesRead);
                     totalRead += bytesRead;
-
-                    System.Threading.Thread.Sleep(2);
                 }
 
                 progress?.Report(1);
@@ -67,6 +78,86 @@ namespace BeatSaverSharp
         }
     }
 
+    /// <summary>
+    /// Rate Limit Info
+    /// </summary>
+    public struct RateLimitInfo
+    {
+        /// <summary>
+        /// Number of requests remaining
+        /// </summary>
+        public readonly int Remaining;
+        /// <summary>
+        /// Rate Limit Reset Time
+        /// </summary>
+        public readonly DateTime Reset;
+        /// <summary>
+        /// Total allowed requests for a given window
+        /// </summary>
+        public readonly int Total;
+
+        /// <summary>
+        /// </summary>
+        /// <param name="remaining"></param>
+        /// <param name="reset"></param>
+        /// <param name="total"></param>
+        public RateLimitInfo(int remaining, DateTime reset, int total)
+        {
+            Remaining = remaining;
+            Reset = reset;
+            Total = total;
+        }
+
+        internal static RateLimitInfo? FromHttp(HttpResponseMessage resp)
+        {
+            int _remaining;
+            DateTime? _reset = null;
+            int _total;
+
+            if (resp.Headers.TryGetValues("Rate-Limit-Remaining", out IEnumerable<string> remainings))
+            {
+                string val = remainings.FirstOrDefault();
+                if (val != null)
+                {
+                    if (int.TryParse(val, out int result)) _remaining = result;
+                    else return null;
+                }
+                else return null;
+            }
+            else return null;
+
+            if (resp.Headers.TryGetValues("Rate-Limit-Total", out IEnumerable<string> totals))
+            {
+                string val = totals.FirstOrDefault();
+                if (val != null)
+                {
+                    if (int.TryParse(val, out int result)) _total = result;
+                    else return null;
+                }
+                else return null;
+            }
+            else return null;
+
+            if (resp.Headers.TryGetValues("Rate-Limit-Reset", out IEnumerable<string> resets))
+            {
+                string val = resets.FirstOrDefault();
+                if (val != null)
+                {
+                    if (ulong.TryParse(val, out ulong ts))
+                    {
+                        _reset = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        _reset = _reset?.AddSeconds(ts).ToLocalTime();
+                    }
+                    else return null;
+                }
+            }
+            else return null;
+
+            if (_reset == null) return null;
+            return new RateLimitInfo(_remaining, (DateTime)_reset, _total);
+        }
+    }
+
     internal class HttpResponse
     {
         public readonly HttpStatusCode StatusCode;
@@ -74,6 +165,7 @@ namespace BeatSaverSharp
         public readonly HttpResponseHeaders Headers;
         public readonly HttpRequestMessage RequestMessage;
         public readonly bool IsSuccessStatusCode;
+        public readonly RateLimitInfo? RateLimit;
 
         private readonly byte[] _body;
 
@@ -84,6 +176,7 @@ namespace BeatSaverSharp
             Headers = resp.Headers;
             RequestMessage = resp.RequestMessage;
             IsSuccessStatusCode = resp.IsSuccessStatusCode;
+            RateLimit = RateLimitInfo.FromHttp(resp);
 
             _body = body;
         }

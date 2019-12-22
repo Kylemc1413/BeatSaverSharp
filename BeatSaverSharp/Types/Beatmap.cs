@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using BeatSaverSharp.Exceptions;
@@ -18,14 +19,33 @@ namespace BeatSaverSharp
         /// Fetch a Beatmap by Key
         /// </summary>
         /// <param name="key">Hex Key</param>
+        /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public static async Task<Beatmap> FromKey(string key) => await BeatSaver.Key(key);
+        public static async Task<Beatmap> FromKey(string key, IProgress<double> progress = null) => await BeatSaver.Key(key, progress);
+        /// <summary>
+        /// Fetch a Beatmap by Key
+        /// </summary>
+        /// <param name="key">Hex Key</param>
+        /// <param name="token">Cancellation token</param>
+        /// <param name="progress">Optional progress reporter</param>
+        /// <returns></returns>
+        public static async Task<Beatmap> FromKey(string key, CancellationToken token, IProgress<double> progress = null) => await BeatSaver.Key(key, token, progress);
+
         /// <summary>
         /// Fetch a Beatmap by Hash
         /// </summary>
         /// <param name="hash">SHA1 Hash</param>
+        /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public static async Task<Beatmap> FromHash(string hash) => await BeatSaver.Hash(hash);
+        public static async Task<Beatmap> FromHash(string hash, IProgress<double> progress = null) => await BeatSaver.Hash(hash, progress);
+        /// <summary>
+        /// Fetch a Beatmap by Hash
+        /// </summary>
+        /// <param name="hash">SHA1 Hash</param>
+        /// <param name="token">Cancellation token</param>
+        /// <param name="progress">Optional progress reporter</param>
+        /// <returns></returns>
+        public static async Task<Beatmap> FromHash(string hash, CancellationToken token, IProgress<double> progress = null) => await BeatSaver.Hash(hash, token, progress);
         #endregion
 
         #region JSON Properties
@@ -241,10 +261,18 @@ namespace BeatSaverSharp
         /// <param name="direct">If true, will skip counting the download request</param>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<byte[]> DownloadZip(bool direct = false, IProgress<double> progress = null)
+        public async Task<byte[]> DownloadZip(bool direct = false, IProgress<double> progress = null) => await DownloadZip(direct, CancellationToken.None, progress);
+        /// <summary>
+        /// Download the Beatmap Zip as a byte array
+        /// </summary>
+        /// <param name="direct">If true, will skip counting the download request</param>
+        /// <param name="token">Cancellation token</param>
+        /// <param name="progress">Optional progress reporter</param>
+        /// <returns></returns>
+        public async Task<byte[]> DownloadZip(bool direct, CancellationToken token, IProgress<double> progress = null)
         {
             string url = direct ? DirectDownload : DownloadURL;
-            var resp = await Http.GetAsync(url, progress).ConfigureAwait(false);
+            var resp = await Http.GetAsync(url, token, progress).ConfigureAwait(false);
 
             return resp.Bytes();
         }
@@ -254,10 +282,17 @@ namespace BeatSaverSharp
         /// </summary>
         /// <param name="progress">Optional progress reporter</param>
         /// <returns></returns>
-        public async Task<byte[]> FetchCoverImage(IProgress<double> progress = null)
+        public async Task<byte[]> FetchCoverImage(IProgress<double> progress = null) => await FetchCoverImage(CancellationToken.None, progress);
+        /// <summary>
+        /// Fetch the Beatmap's Cover Image as a byte array
+        /// </summary>
+        /// <param name="token">Cancellation token</param>
+        /// <param name="progress">Optional progress reporter</param>
+        /// <returns></returns>
+        public async Task<byte[]> FetchCoverImage(CancellationToken token, IProgress<double> progress = null)
         {
             string url = $"{BeatSaver.BaseURL}{CoverURL}";
-            var resp = await Http.GetAsync(url, progress).ConfigureAwait(false);
+            var resp = await Http.GetAsync(url, token, progress).ConfigureAwait(false);
 
             return resp.Bytes();
         }
